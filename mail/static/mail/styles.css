@@ -1,0 +1,11 @@
+textarea {
+    min-height: 400px;
+}
+
+.email-button {
+    font-weight: 700;
+    font-size: 20px;
+    border: none;
+    padding: 0px;
+    background-color: white;
+}

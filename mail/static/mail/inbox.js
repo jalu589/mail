@@ -3,14 +3,14 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', () => compose_email('none'));
+  document.querySelector('#compose').addEventListener('click', () => compose_email('none', 'none', 'none'));
 
   // By default, load the inbox
   load_mailbox('inbox');
 });
 
 
-function compose_email(recipient) {
+function compose_email(recipient, subject, body) {
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
@@ -18,11 +18,13 @@ function compose_email(recipient) {
     // Clear out composition fields
     if (recipient == 'none') {
         document.querySelector('#compose-recipients').value = '';
+        document.querySelector('#compose-subject').value = '';
+        document.querySelector('#compose-body').value = '';
     } else {
         document.querySelector('#compose-recipients').value = recipient;
+        document.querySelector('#compose-subject').value = subject;
+        document.querySelector('#compose-body').value = body;
     }
-    document.querySelector('#compose-subject').value = '';
-    document.querySelector('#compose-body').value = '';
 
     // convert form info to json and POST to api
     document.querySelector('form').onsubmit = function() {
@@ -143,7 +145,8 @@ function getEmail(id) {
             replyButton.innerText = 'Reply'
             replyButton.className = 'email-button';
             replyButton.onclick = () => {
-                compose_email(email.sender)
+                const body = `On ${email.timestamp} ${email.sender} wrote "${email.body}"`
+                compose_email(email.sender, `Re: ${email.subject}`, body)
             }
             emailsView.appendChild(replyButton);
 

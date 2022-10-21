@@ -110,6 +110,11 @@ function getEmail(id) {
         sender.innerText = `From: ${email.sender}`
         sender.style = 'margin: 0px;'
         emailsView.appendChild(sender)
+        // create timestamp element
+        const time = document.createElement('p')
+        time.innerText = `${email.timestamp}`
+        time.style = 'margin: 0px 0px 20px 0px;'
+        emailsView.appendChild(time)
         // create email body element
         const body = document.createElement('p');
         body.innerText = `${email.body}`
@@ -125,7 +130,7 @@ function getEmail(id) {
             } else {
                 readButton.innerText = 'Mark Read';
             };
-            readButton.style = 'margin-right: 12px;';
+            readButton.className = 'read-archive';
             readButton.onclick = () => {
                 readEmail(email)
             }
@@ -138,6 +143,7 @@ function getEmail(id) {
             } else {
                 archiveButton.innerText = 'Archive';
             };
+            archiveButton.className = 'read-archive';
             archiveButton.onclick = () => {
                 archiveEmail(email)
             }
@@ -163,40 +169,37 @@ function load_mailbox(mailbox) {
         emails.forEach(function(email) {
             const miniEmail = document.createElement('div');
             miniEmail.style = 'margin-bottom: 10px';
+            miniEmail.className = 'mini-email';
             const emailsView = document.getElementById('emails-view');
             let receivers = '';
             email.recipients.forEach(function(recipient) {
                 receivers += `${recipient} `
             })
+            const subject = document.createElement('button');
+            subject.innerText = email.subject
+            subject.className = 'email-button'
+            subject.onclick = () => {
+                getEmail(email.id)
+            }
             if (mailbox === 'sent') {
-                const subject = document.createElement('button');
-                subject.innerText = email.subject
-                subject.className = 'email-button'
-                subject.onclick = () => {
-                    getEmail(email.id)
-                }
                 miniEmail.appendChild(subject)
-                const recipients = document.createElement('p');
+                const recipients = document.createElement('div');
                 recipients.innerText = `To: ${receivers}`
                 miniEmail.appendChild(recipients)
             } else {
-                const subject = document.createElement('button');
-                subject.innerText = email.subject
-                subject.className = 'email-button'
                 if (email.read) {
                     subject.style = 'color: black;'
                 } else {
                     subject.style = 'color: #007bff;'
                 }
-                subject.onclick = () => {
-                    getEmail(email.id)
-                }
                 miniEmail.appendChild(subject)
-                const sender = document.createElement('p');
+                const sender = document.createElement('div');
                 sender.innerText = `From: ${email.sender}`
-                sender.style = 'margin: 0px;'
                 miniEmail.appendChild(sender)
             }
+            const time = document.createElement('div')
+            time.innerText = `${email.timestamp}`
+            miniEmail.appendChild(time)
             emailsView.appendChild(miniEmail);
         })
     })

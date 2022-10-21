@@ -3,20 +3,24 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', compose_email);
+  document.querySelector('#compose').addEventListener('click', () => compose_email('none'));
 
   // By default, load the inbox
   load_mailbox('inbox');
 });
 
 
-function compose_email() {
+function compose_email(recipient) {
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
 
     // Clear out composition fields
-    document.querySelector('#compose-recipients').value = '';
+    if (recipient == 'none') {
+        document.querySelector('#compose-recipients').value = '';
+    } else {
+        document.querySelector('#compose-recipients').value = recipient;
+    }
     document.querySelector('#compose-subject').value = '';
     document.querySelector('#compose-body').value = '';
 
@@ -90,8 +94,6 @@ function getEmail(id) {
     fetch(`/emails/${id}`)
     .then(response => response.json())
     .then(email => {
-        // Print email
-        console.log(email);
         // set header
         document.querySelector('#emails-view').innerHTML = `<h3>${email.subject}</h3>`;
         const emailsView = document.getElementById('emails-view');
@@ -130,11 +132,20 @@ function getEmail(id) {
             } else {
                 readButton.innerText = 'Mark Read';
             };
-            readButton.className = 'read-archive';
+            readButton.className = 'email-button';
             readButton.onclick = () => {
                 readEmail(email)
             }
             emailsView.appendChild(readButton);
+
+            const replyButton = document.createElement('button');
+            replyButton.id = 'reply-button';
+            replyButton.innerText = 'Reply'
+            replyButton.className = 'email-button';
+            replyButton.onclick = () => {
+                compose_email(email.sender)
+            }
+            emailsView.appendChild(replyButton);
 
             const archiveButton = document.createElement('button');
             archiveButton.id = 'archive-button'
@@ -143,7 +154,7 @@ function getEmail(id) {
             } else {
                 archiveButton.innerText = 'Archive';
             };
-            archiveButton.className = 'read-archive';
+            archiveButton.className = 'email-button';
             archiveButton.onclick = () => {
                 archiveEmail(email)
             }
@@ -177,7 +188,7 @@ function load_mailbox(mailbox) {
             })
             const subject = document.createElement('button');
             subject.innerText = email.subject
-            subject.className = 'email-button'
+            subject.className = 'subject'
             subject.onclick = () => {
                 getEmail(email.id)
             }
